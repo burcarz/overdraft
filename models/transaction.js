@@ -1,34 +1,25 @@
-const router = require("express").Router();
-const Transaction = require("../models/transaction.js");
+const mongoose = require("mongoose");
 
-router.post("/api/transaction", ({body}, res) => {
-  Transaction.create(body)
-    .then(dbTransaction => {
-      res.json(dbTransaction);
-    })
-    .catch(err => {
-      res.status(404).json(err);
-    });
-});
+const Schema = mongoose.Schema;
 
-router.post("/api/transaction/bulk", ({body}, res) => {
-  Transaction.insertMany(body)
-    .then(dbTransaction => {
-      res.json(dbTransaction);
-    })
-    .catch(err => {
-      res.status(404).json(err);
-    });
-});
+const transactionSchema = new Schema(
+  {
+    name: {
+      type: String,
+      trim: true,
+      required: "Enter a name for transaction"
+    },
+    value: {
+      type: Number,
+      required: "Enter an amount"
+    },
+    date: {
+      type: Date,
+      default: Date.now
+    }
+  }
+);
 
-router.get("/api/transaction", (req, res) => {
-  Transaction.find({}).sort({date: -1})
-    .then(dbTransaction => {
-      res.json(dbTransaction);
-    })
-    .catch(err => {
-      res.status(404).json(err);
-    });
-});
+const Transaction = mongoose.model("Transaction", transactionSchema);
 
-module.exports = router;
+module.exports = Transaction;
